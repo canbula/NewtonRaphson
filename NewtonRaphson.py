@@ -10,7 +10,6 @@ class NewtonRaphson(FuncAnimation):
         self.x = x
         self.h = h
         self.tolerance = tolerance
-        self.satisfied = False
         self.iteration_limit = iteration_limit
         self.x_limits = x_limits
         self.verbose = verbose
@@ -25,7 +24,7 @@ class NewtonRaphson(FuncAnimation):
         pass
 
     def update_animation(self, frame):
-        if self.satisfied or frame >= self.iteration_limit:
+        if np.abs(self.f(self.x)) < self.tolerance or frame >= self.iteration_limit:
             plt.close()
         self.ax.clear()
         self.ax.set_title(f"Newton Raphson Method: Iteration={frame} @ x={self.x:.6f}")
@@ -45,18 +44,19 @@ class NewtonRaphson(FuncAnimation):
         return (self.f(self.x+self.h) - self.f(self.x))/self.h
 
     def next_root(self):
-        term = self.f(self.x)/self.diff()
-        if term < self.tolerance:
-            self.satisfied = True
-        return self.x - term
+        return self.x - self.f(self.x)/self.diff()
 
 
-def f(x):
+def f1(x):
     return x**2 - 4*x - 7
 
 
-def g(x):
+def f2(x):
     return 27*x**3 - 3*x + 1
+
+
+def f3(x):
+    return x**3 - x - 1
 
 
 def main():
@@ -65,13 +65,19 @@ def main():
     tolerance = 1e-3
     iteration_limit = 10
     x_limits = [2, 8, 100]
-    NewtonRaphson(f, x, h, tolerance, iteration_limit, x_limits, True)
+    NewtonRaphson(f1, x, h, tolerance, iteration_limit, x_limits, True)
     x = 5
     h = 1e-6
     tolerance = 1e-6
     iteration_limit = 30
     x_limits = [-1, 1, 100]
-    NewtonRaphson(g, x, h, tolerance, iteration_limit, x_limits, True)
+    NewtonRaphson(f2, x, h, tolerance, iteration_limit, x_limits, True)
+    x = 1
+    h = 1e-6
+    tolerance = 1e-3
+    iteration_limit = 10
+    x_limits = [-0.5, 3, 100]
+    NewtonRaphson(f3, x, h, tolerance, iteration_limit, x_limits, True)
 
 
 if __name__ == "__main__":
